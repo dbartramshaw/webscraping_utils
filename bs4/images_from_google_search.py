@@ -70,6 +70,8 @@ def pull_google_images(save_path = '/Users/bartramshawd/Pictures/google_search_p
 
 pull_google_images()
 
+testd = {'yes':1}
+'yes' in testd
 
 ##############
 # PLAY CODE
