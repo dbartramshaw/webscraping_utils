@@ -34,6 +34,11 @@ url='https://enterprise.microsoft.com/en-us/digital-transformation/'
 r = requests.get(url, headers=headers, timeout=10)
 
 
+
+####################
+# bs4 notes
+####################
+
 # Run bs4
 r = requests.get(url)
 html = r.text
@@ -50,17 +55,21 @@ text = ' '.join(text.split())
 # Get soup from saved unicode HTML
 soup = BeautifulSoup(test_html,"lxml")
 
+
 # Find all links on a page
 soup.find_all('a')
 for link in soup.find_all('a'):
     print(link.get('href'))
 
+
 # Find a certain class on a page
 soup.findAll("div", { "class" : "c-article-template__info" })
+
 
 # find certain tag and extract text
 for hit in soup.findAll("div", { "class" : "c-article-template__info" }):
     print ' '.join(hit.text.split())
+
 
 # Find heading
 soup.find('h1')
@@ -75,6 +84,7 @@ for script in soup(["script", "style"]):
 for script in soup.findAll("section", { "id" : "footerArea" }):
     script.extract()
 
+
 # Show sections
 for section in soup.findAll("section"):
     print(section.get('id'))
@@ -85,8 +95,7 @@ text = org_text.replace("\n"," ")
 text = ' '.join(text.split())
 
 
-
-# VIDEO LINK
+# video link
 # Store all youtube videos on page
 videos_stored=[]
 for i in range(0,len(data)):
@@ -107,3 +116,41 @@ for i in range(0,len(data)):
 videos = pd.DataFrame(videos_stored,columns=['video','url'])
 videos['video'].unique()
 videos.groupby('video').size().sort_values()
+
+
+
+####################
+# Google Search
+####################
+# Links from google search - removing wierd hyperlink components
+urls = ['https://www.google.co.uk/search?q=sore+on+gums&dcr=0&ei=MQhyWo-WM-ycgAacnIa4Bg&start=10&sa=N&biw=1680&bih=1669']
+
+links=[]
+for url in urls:
+    page = requests.get(url)
+    #print('Loaded page with: %s' % page)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    soup.find_all('a')
+
+    r = requests.get(url)
+    html = r.text
+    soup = BeautifulSoup(html, 'lxml')
+    for link in soup.find_all('a'):
+        print(link.get('href'))
+
+    import urlparse
+    for a in soup.select('.r a'):
+        print urlparse.parse_qs(urlparse.urlparse(a['href']).query)['q'][0]
+        links.append(urlparse.parse_qs(urlparse.urlparse(a['href']).query)['q'][0])
+
+
+
+####################
+# webbrowser
+####################
+import webbrowser
+chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+webbrowser.get(chrome_path).open(URL)
+
+for i in range(0,10):
+    webbrowser.get(chrome_path).open(pdfs.values[i])
