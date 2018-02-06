@@ -250,7 +250,6 @@ class word_features_sim(object):
     		Returns:
     		-----------
     		self: update of the class attributes
-
             self.word_features (tfidf matrix)
             self.feature_names
             self.top_words_per_doc
@@ -261,24 +260,24 @@ class word_features_sim(object):
         def __init__(self
                     ,input_text
                     ,vec_type='tfidf'
+                    ,n_top_words=20
+                    ,n_similar_docs=20
                     ,sublinear_tf=False
                     ,ngram_range=(1,1)
                     ,norm=None
-                    ,max_features=None
-                    ,vocabulary=None
-                    ):
+                    ,max_features=None):
 
             if vec_type=='tfidf':
                 from sklearn.feature_extraction.text import TfidfVectorizer
-                vectorizer = TfidfVectorizer(analyzer='word',stop_words='english',ngram_range=ngram_range,max_features=max_features,vocabulary=vocabulary) #sublinear_tf=True,
+                vectorizer = TfidfVectorizer(analyzer='word',stop_words='english',ngram_range=ngram_range,max_features=max_features) #sublinear_tf=True,
 
             if vec_type=='freq':
                 from sklearn.feature_extraction.text import CountVectorizer
-                vectorizer = CountVectorizer(analyzer='word',stop_words='english',ngram_range=ngram_range,max_features=max_features,vocabulary=vocabulary=) #sublinear_tf=True,
+                vectorizer = CountVectorizer(analyzer='word',stop_words='english',ngram_range=ngram_range,max_features=max_features) #sublinear_tf=True,
 
             self.word_features = vectorizer.fit_transform(input_text)
             self.feature_names = vectorizer.get_feature_names()
-            #print('-----------------------------------------')
+            print('-----------------------------------------')
             print('COMPLETE: '+vec_type+' Word Features Generated')
 
             # Store all word that appear in each doc and TFIDF score
@@ -286,117 +285,18 @@ class word_features_sim(object):
             _df['phrase']=[self.feature_names[x] for x in _df.doc_matrix_indices]
             _df = _df.sort_values(['doc_index',vec_type],ascending=[1,0])
             _df['rank']=_df.groupby('doc_index')[vec_type].rank(ascending=False)
-            self._df = _df
 
 
-        def top_words(self,n_top_words=20):
             # Store top words
-            self.top_words_per_doc = self._df[self._df['rank']<=n_top_words]
+            self.top_words_per_doc = _df[_df['rank']<=n_top_words]
             self.top_words_per_doc = self.top_words_per_doc.groupby('doc_index').agg({'phrase':lambda x:', '.join(x)}).reset_index()
             print('COMPLETE: Top words generated')
 
-        def doc_similarity(self
-                          ,labels=[]
-                          ,n_similar_docs=20
-                          ):
-            """
-                -----------
-                Parameters:
-        		-----------
-                labels: list of labels that correspond to input_text_index
-            """
             # Top similar between each doc
             cosine_df = pd.DataFrame((self.word_features * self.word_features.T).A)
             cs_df_reshaped = pd.DataFrame(cosine_df.stack()).reset_index()
             cs_df_reshaped.columns=[['doc_index','compared_doc_index','cosine_similarity']]
             cs_df_reshaped['rank']=cs_df_reshaped.groupby('doc_index')['cosine_similarity'].rank(ascending=False)
             self.top_similar_docs = cs_df_reshaped[cs_df_reshaped['rank']<=n_similar_docs].sort_values(['doc_index','rank'],ascending=[1,1])
-            if labels!=[]:
-                self.top_similar_docs['label']         = [labels[x] for x in self.top_similar_docs.doc_index]
-                self.top_similar_docs['compare_label'] = [labels[x] for x in self.top_similar_docs.compared_doc_index]
-
             print('COMPLETE: Similarity computed')
-            #print('-----------------------------------------')
-
-
-import collections
-from collections import defaultdict
-def join_two_dicts(a,
-                   b,
-                   a_val_name='a_val_name',
-                   b_val_name='b_val_name',
-                   create_inner_dict = True):
-
-        """
-            Useful when both dicts dont have same values
-            Use create_inner_dict = True to identify value origins
-
-            Method: Left Join
-            Primary key in a: All values must be in a.
-        """
-
-        if create_inner_dict == True:
-            # create inner dicts
-            a = {key:{a_val_name:val} for key,val in a.items()}
-            b = {key:{b_val_name:val} for key,val in b.items() if key in a }
-
-        dd = defaultdict(list)
-        for d in (a, b): # you can list as many input dicts as you want here
-            for key, value in d.iteritems():
-                dd[key].append(value)
-        return dd
-
-# Run this
-industry_text_dict = join_two_dicts(industry_feature.feat_url_dict,
-                                 clean_text_dict,
-                                 a_val_name='industry',
-                                 b_val_name='text',
-                                 create_inner_dict= True)
-
-
-
-
-###############################################################
-# COMPUTE SIMILARITY WITH DOCS
-###############################################################
-
-
-#visualise (RUN IN TERMINAL IN SAME DIRECTORY)
-def cosine_similairy_df(matrixA,matrixB):
-  cosine_df = pd.DataFrame((matrixA * matrixB.T).A)
-  cs_df_reshaped = pd.DataFrame(cosine_df.stack()).reset_index()
-  cs_df_reshaped.columns=[['doc_index','compared_doc_index','cosine_similarity']]
-  cs_df_reshaped['rank']=cs_df_reshaped.groupby('doc_index')['cosine_similarity'].rank(ascending=False)
-  return cs_df_reshaped
-
-
-def industry_doc_similarity(url_text=None
-                           ,url_lables=None
-                           ,industry_text=None
-                           ,industry_labels=None
-                           ):
-        global url_tf,industry_tf,cs_df
-
-
-        print('----- URL LEVEL -----')
-        url_tf = word_features_sim(url_text,vec_type='tfidf')
-        url_tf.top_words(n_top_words=20)
-        url_tf.doc_similarity(labels=url_lables,n_similar_docs=len(url_text))
-
-        print('----- INDUSTRY LEVEL -----')
-        # Ensure the same vocab is used from root
-        industry_tf = word_features_sim(industry_text,vec_type='tfidf',vocabulary=url_tf.feature_names)
-        industry_tf.top_words(n_top_words=20)
-        industry_tf.doc_similarity(labels=industry_labels,n_similar_docs=len(industry_text))
-
-        print('----- SIMILARITY CALC -----')
-        cs_df = cosine_similairy_df(url_tf.word_features,industry_tf.word_features)
-        cs_df.columns = ['page_index','industry_index','cosine_similarity','rank']
-        cs_df['url']=[url_lables[x] for x in cs_df.industry_index]
-        cs_df['industry_predicted']=[industry_corpus['industry'].values[x] for x in cs_df.industry_index]
-        cs_df['top_quintile']= (cs_df['cosine_similarity']>=cs_df.cosine_similarity.quantile(0.9)).astype(int)
-        cs_df['top2_quintile']= (cs_df['cosine_similarity']>=cs_df.cosine_similarity.quantile(0.8)).astype(int)
-        cs_df = cs_df.sort_values(['page_index','rank'],ascending=[1,1])
-
-        print('COMPLETE: Similarity Calculation')
-        print('-----------------------------------------')
+            print('-----------------------------------------')
