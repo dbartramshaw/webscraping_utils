@@ -11,6 +11,8 @@ import datetime
 import os
 import base64
 
+print('hi j')
+
 '''
 ## driver setup in terminal
 $ cd $HOME/Downloads
@@ -21,9 +23,30 @@ $ mv chromedriver $HOME/bin
 $ echo "export PATH=$PATH:$HOME/bin" >> $HOME/.bash_profile
 '''
 
-csv_path='/Users/bartramshawd/Documents/DBS/python_code/webscrape_utils/selenium/'
-urls = pd.read_csv(csv_path+'example_urls.csv')
-urls.head()
+csv_path = '/Users/bartramshawd/Documents/DBS/python_code/webscrape_utils/selenium/'
+
+
+print(csv_path+'jamies_urls.csv')
+
+path = csv_path+'jamies_urls.csv'
+path
+
+
+urls = pd.read_csv(path)
+
+urls.head(20)
+
+n=1
+range_size = 15
+urls[-3:]
+
+
+import signal
+import pandas as pd
+import signal
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+
 
 # added timeout for page load (15secs)
 def driver_screenshot_timeout(url_list, folder_name='screenshots'):
@@ -64,8 +87,8 @@ def driver_screenshot_timeout(url_list, folder_name='screenshots'):
 
 
 ## Run it
-driver_screenshot(urls.url[0:10], folder_name='driver_screenshots')
-
+driver_screenshot_timeout(urls.url[0:10], folder_name='driver_screenshots')
+urls.head()
 
 
 def driver_screenshot(url_list, folder_name='screenshots'):
