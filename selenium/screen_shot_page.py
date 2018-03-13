@@ -11,7 +11,6 @@ import datetime
 import os
 import base64
 
-print('hi j')
 
 '''
 ## driver setup in terminal
@@ -24,28 +23,19 @@ $ echo "export PATH=$PATH:$HOME/bin" >> $HOME/.bash_profile
 '''
 
 csv_path = '/Users/bartramshawd/Documents/DBS/python_code/webscrape_utils/selenium/'
-
-
-print(csv_path+'jamies_urls.csv')
-
-path = csv_path+'jamies_urls.csv'
-path
-
-
 urls = pd.read_csv(path)
-
-urls.head(20)
-
-n=1
-range_size = 15
-urls[-3:]
-
 
 import signal
 import pandas as pd
 import signal
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
+
+url = 'https://www.purina.co.uk/cats/cat-breeds/cat-breed-library/japanese-bobtail-long-hair'
+url ='https://www.purina.co.uk/cat/gourmet/product-range/mon-petit/duo-fish-menu'
+driver = webdriver.Firefox(executable_path = '/usr/local/bin/geckodriver')
+driver.get(url)
+source_ = driver.page_source
 
 
 # added timeout for page load (15secs)
