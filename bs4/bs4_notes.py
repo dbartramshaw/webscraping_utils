@@ -51,6 +51,9 @@ text = org_text.replace("\n"," ")
 text = ' '.join(text.split())
 
 
+# Find title
+title = soup.find('h1')
+
 
 # Get soup from saved unicode HTML
 soup = BeautifulSoup(test_html,"lxml")
@@ -154,3 +157,53 @@ webbrowser.get(chrome_path).open(URL)
 
 for i in range(0,10):
     webbrowser.get(chrome_path).open(pdfs.values[i])
+
+
+
+
+####################
+# local files
+####################
+test_url = '6361742f66656c69782f6361742d666f6f642f70726f64756374732f63616e2d666973682d73656c656374696f6e2d696e2d6a656c6c79.html'
+soup = BeautifulSoup(open(urls), 'html.parser')
+
+# Extract Text
+for script in soup(["script", "style"]):
+    script.extract()
+org_text = soup.get_text()
+text = org_text.replace("\n"," ")
+text = ' '.join(text.split())
+len(text)
+
+def extract_para_local(local_html_path):
+    soup = BeautifulSoup(open(local_html_path), 'html.parser')
+    para_text=' '.join([paragraph.getText() for paragraph in soup.findAll("p")])
+    text = para_text.replace("\n"," ")
+    text = ' '.join(text.split())
+    #print('COMPLETE:',local_html_path)
+    file_name = local_html_path[100+6:]
+    return file_name,text
+
+
+# Load files
+from os import listdir
+from os.path import isfile, join
+path_loc = '/Users/bartramshawd/Documents/website_project/'
+saved_results_path = 'website_data/'
+fnames = [f for f in listdir(saved_results_path) if isfile(join(saved_results_path, f))]
+url_files = [path_loc+i for i in files.url.values]
+
+
+# MultiProcess
+from multiprocessing import Pool
+import pandas as pd
+
+p = Pool(10)  # Pool tells how many at a time
+extracted_pText = p.map(extract_para_local, url_files)
+p.terminate()
+p.join()
+
+#Save to df
+len(extracted_pText)
+extracted_pText_df = pd.DataFrame(extracted_pText,columns=['file','text'])
+extracted_pText_df.to_csv(path_loc+'/website_ptext.csv',index=None,encoding='utf-8')

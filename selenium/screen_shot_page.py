@@ -31,11 +31,11 @@ import signal
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 
-url = 'https://www.purina.co.uk/cats/cat-breeds/cat-breed-library/japanese-bobtail-long-hair'
-url ='https://www.purina.co.uk/cat/gourmet/product-range/mon-petit/duo-fish-menu'
-driver = webdriver.Firefox(executable_path = '/usr/local/bin/geckodriver')
-driver.get(url)
-source_ = driver.page_source
+# url = 'https://www.purina.co.uk/cats/cat-breeds/cat-breed-library/japanese-bobtail-long-hair'
+# url ='https://www.purina.co.uk/cat/gourmet/product-range/mon-petit/duo-fish-menu'
+# driver = webdriver.Firefox(executable_path = '/usr/local/bin/geckodriver')
+# driver.get(url)
+# source_ = driver.page_source
 
 
 # added timeout for page load (15secs)
