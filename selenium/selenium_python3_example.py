@@ -73,6 +73,8 @@ header={'User-Agent':"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KH
 
 # Define page
 url = 'http://www.thefamouspeople.com/singers.php'
+url='https://www.instagram.com/p/yXor77n3l_/'
+
 
 # Get page
 response = http.request('GET', url,headers=header)
@@ -87,3 +89,43 @@ text = ' '.join(text.split())
 
 # Find title
 title = soup.find('h1').text
+
+# Find all images
+imgs = soup.findAll("img",{"alt":True, "src":True})
+for img in imgs:
+    print(img["src"])
+
+
+
+#########################
+# Images from Instagram
+#########################
+import requests
+import json
+import sys
+import urllib
+import webbrowser
+#http://myword.jeffreykishner.com/users/kishner/essays/030.html
+
+data = requests.request('GET','http://api.instagram.com/publicapi/oembed/?url=' + url)
+if data.status_code == 200:
+    embed = json.loads(data.text)
+    text_title = embed['title']
+    img = embed['thumbnail_url']
+    embed['html']
+    print(img)
+    img2 = urllib.parse.quote(img, '')
+    print(img2)
+
+
+def insta_pull(url):
+    data = requests.request('GET','http://api.instagram.com/publicapi/oembed/?url=' + url)
+    if data.status_code == 200:
+        embed = json.loads(data.text)
+        text_title = embed['title']
+        img = embed['thumbnail_url']
+        return text_title,img
+    else:
+        return '',''
+
+insta_pull('https://www.instagram.com/p/yXor77n3l_/')
