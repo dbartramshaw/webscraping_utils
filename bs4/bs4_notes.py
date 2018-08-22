@@ -40,7 +40,7 @@ r = requests.get(url, headers=headers, timeout=10)
 ####################
 
 # Run bs4
-r = requests.get(url)
+r = requests.get('http://www.dentaquest.com/sitemap/')
 html = r.text
 soup = BeautifulSoup(html, 'lxml')
 for script in soup(["script", "style"]):
@@ -207,3 +207,12 @@ p.join()
 len(extracted_pText)
 extracted_pText_df = pd.DataFrame(extracted_pText,columns=['file','text'])
 extracted_pText_df.to_csv(path_loc+'/website_ptext.csv',index=None,encoding='utf-8')
+
+
+
+
+# Find  redirect url
+import requests
+url='https://t.co/1ANZzXNP6T'
+r = requests.get(url)
+print(r.url)
