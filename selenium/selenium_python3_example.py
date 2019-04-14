@@ -107,6 +107,7 @@ import urllib
 import webbrowser
 #http://myword.jeffreykishner.com/users/kishner/essays/030.html
 
+url = 'https://www.instagram.com/whatchalookin_nat/'
 data = requests.request('GET','http://api.instagram.com/publicapi/oembed/?url=' + url)
 if data.status_code == 200:
     embed = json.loads(data.text)
@@ -128,4 +129,87 @@ def insta_pull(url):
     else:
         return '',''
 
-insta_pull('https://www.instagram.com/p/yXor77n3l_/')
+text_title,img = insta_pull('https://www.instagram.com/p/BurruYAgTKs/')
+text_title
+
+from PIL import Image
+import requests
+from io import BytesIO
+
+response = requests.get(img)
+img = Image.open(BytesIO(response.content))
+img
+
+
+#########################
+# Open in webdriver
+#########################
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+# option = webdriver.ChromeOptions()
+# chrome_options = Options()
+# chrome_options.add_argument("--window-size=1720,3000")
+# driver = webdriver.Chrome(chrome_options=chrome_options)
+
+driver = webdriver.Chrome()
+driver.set_window_position(1600+1750, 0)
+driver.set_window_size(1720,3000)
+
+url_list =  ['https://www.medicare.gov',
+             'https://www.medicaremadeclear.com',
+             'https://www.allwellmedicare.com/',
+             'https://www.azcompletehealth.com/',
+             'https://www.uhcmedicaresolutions.com/',
+             'https://www.uhc.com/',
+             'https://www.azahcccs.gov/',
+             'https://www.cigna.com/',
+             'https://www.anthem.com/',
+             'http://www.uhcprovider.com',
+             'https://www.humana.com',
+             'https://www.aarp.org',
+             'https://www.hioscar.com',
+             'https://seniors.lovetoknow.com',
+             'https://www.nextavenue.org',
+             'https://www.seniorliving.org']
+
+
+for i in url_list:
+    print(i)
+    # driver.get(i)
+
+    #Opens new tab
+    driver.execute_script("window.open('"+i+"');")
+driver.quit()
+
+
+
+driver = webdriver.Chrome()
+driver.get('https://www.instagram.com/p/yXor77n3l_/')
+
+
+
+
+
+#########################
+# AutoScroll
+#########################
+
+#Scroll until cannot scroll anymore
+SCROLL_PAUSE_TIME = 0.5
+
+# Get scroll height
+last_height = driver.execute_script("return document.body.scrollHeight")
+
+while True:
+    # Scroll down to bottom
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    # Wait to load page
+    time.sleep(SCROLL_PAUSE_TIME)
+
+    # Calculate new scroll height and compare with last scroll height
+    new_height = driver.execute_script("return document.body.scrollHeight")
+    if new_height == last_height:
+        break
+    last_height = new_height

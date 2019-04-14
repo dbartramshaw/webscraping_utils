@@ -32,7 +32,7 @@ def get_listing(url):
 headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
 url='https://enterprise.microsoft.com/en-us/digital-transformation/'
 r = requests.get(url, headers=headers, timeout=10)
-
+type(r)
 
 
 ####################
@@ -40,7 +40,7 @@ r = requests.get(url, headers=headers, timeout=10)
 ####################
 
 # Run bs4
-r = requests.get('http://www.dentaquest.com/sitemap/')
+# r = requests.get('http://www.dentaquest.com/sitemap/')
 html = r.text
 soup = BeautifulSoup(html, 'lxml')
 for script in soup(["script", "style"]):

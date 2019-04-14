@@ -20,6 +20,17 @@ $ unzip chromedriver_mac32.zip
 $ mkdir -p $HOME/bin
 $ mv chromedriver $HOME/bin
 $ echo "export PATH=$PATH:$HOME/bin" >> $HOME/.bash_profile
+
+## NOT WORKING
+# your executable path is wherever you saved the gecko webdriver
+# export PATH=$PATH:/Users/dshaw/Downloads/geckodriver.exe
+# geckodriver = "/Users/dshaw/Downloads/geckodriver.exe"
+# browser = webdriver.Firefox(executable_path=geckodriver)
+
+## WORKING
+#brew install geckodriver
+browser = webdriver.Firefox()
+
 '''
 
 csv_path = '/Users/bartramshawd/Documents/DBS/python_code/webscrape_utils/selenium/'
